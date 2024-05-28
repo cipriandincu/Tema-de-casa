@@ -1,0 +1,71 @@
+void generate_objects(struct object *objects, int no_objects){ //void print_objects(struct object *objects, int no_objects){ // afiseaza pe ecran tipurile si arcteristicile homarilor generati
+    int iterator;
+
+    printf("\n");
+    for (iterator = 0; iterator < no_objects ; iterator++) {
+        printf("\n  ~ Homarul[%d] --> Dimensiune : %d cm --> Valoare : %d monede de aur. ",objects[iterator].id, objects[iterator].size, objects[iterator].value);
+    }
+}
+
+void sort_homar_by_value(struct object *objects, int no_objects){ //sorteaza in ordine descrescatoare in functie de valorile generate pentru variabile size
+    int iterator_1;
+    int iterator_2;
+    int index_max;
+    int aux_size;
+    int aux_id;
+    int aux_value;
+
+    for(iterator_1 = 0; iterator_1 < no_objects - 1; iterator_1++){
+        index_max = iterator_1; // se initializeaza index_max cu primul id
+     for(iterator_2 = iterator_1 + 1; iterator_2 < no_objects; iterator_2++){ // se parcurg restul valorilor celorlalte id-uri
+            if ( objects[index_max].value < objects[iterator_2].value ){ // se cauta cea mai mare dimensiune pastrata de variabila de tip struct value si se retine in index-max
+                index_max = iterator_2;
+            }
+        }
+         if (index_max != iterator_1){ // daca index_max si-a actualizat valoarea, inseamna ca primul homar din lista nu este cel mai valoros
+            aux_size = objects[index_max].size; //se pastreaza dimensiunea
+            aux_id = objects[index_max].id;     // id-ul si
+            aux_value = objects[index_max].value;// valoarea celui mai valoros homar , ale carui date sunt pastrate in structura corespunzatoare lui index_max
+            objects[index_max].id = objects[iterator_1].id; // si apoi se inteschimba datele intre secvecta lui index-max si cea a lui iterator_1
+            objects[index_max].value = objects[iterator_1].value;
+            objects[index_max].size = objects[iterator_1].size;
+            objects[iterator_1].size = aux_size;
+            objects[iterator_1].id = aux_id;
+            objects[iterator_1].value = aux_value;
+        }
+    }
+}
+
+
+void greedy_homar_discrete(struct object *objects, int no_objects, int net_capacity) // verifica in functie de capacitatea maxima a plasei de pescuit cati homari incap in aceasta
+        {                                                                            // si selecteaza combinatia care sa aduca cele mai mute mmonede
+          int iterator;
+          int net_current_capacity=0; //se initializeaza capacitatea actuala a plasei , care va fi actualizata de fiecare data cand va fi adaugat un homar
+          int net_value=0;
+          sort_homar_by_value(objects,no_objects); // se apeleaza functia de sortare in functie de pret
+          printf("\n\n  Homarii identificati cu urmatoarele id-uri au fost alesi pentru a completa capacitatea plasei : ");
+          for(iterator=0; iterator<no_objects;iterator++) // sunt parcursi printr-un vector homarii generati
+            { if((net_current_capacity+objects[iterator].size<=net_capacity) && (iterator!=no_objects-1)) // se verifica daca capacitatea libera a plasei la care se adauga dimensiunea homarului urmator este mai mica decat capacitatea totala a plasei
+               { net_current_capacity=net_current_capacity+objects[iterator].size; // in caz afirmativ capacitatea curenta a plasei creste, homarul fiind adaugat
+                 net_value =net_value+ objects[iterator].value; // valoarea acumulata in urma adaugarii pestilor in plasa creste in momentul in care un alt homar este adaugat
+                 printf("%d, ",objects[iterator].id );} // se afiseaza id-ul homarului adaugat anterior
+              else  if((net_current_capacity+objects[iterator].size<=net_capacity)&& (iterator==no_objects-1))
+                       {net_current_capacity=net_current_capacity+objects[iterator].size; // se efectueaza aceleasi actiuni ca mai sus,
+                                                                                          // dar in momentul in care ne aflam la ultima verificare nu se mai afiseaza ";" dupa id, ci cu "."
+                     net_value =net_value+ objects[iterator].value;
+                     printf("%d.",objects[iterator].id );}
+           }
+    printf("\n\n  Valoarea homarilor din plasa de pescuit este de %d monede de aur.\n\n", net_value);
+}
+
+genereaza variante aleatorii pentru id-ul, dimensiunea si valoarea fiecarui homar ; folosind un vector
+    int iterator;
+    time_t t;
+
+    srand((unsigned) time(&t)); // initializeaza generatorul de numere aleatorii
+    for(iterator = 0; iterator < no_objects; iterator++){ // parcurge numarul de elemente dat de la tastatura
+        objects[iterator].id = iterator; //atribuirea id-ului
+        objects[iterator].size = rand() % 50 + 1; //atribuirea dimensiunii ( intre 1 si 50)
+        objects[iterator].value = rand() % 50 + 1; //atribirea valorii (intre 1 si 50)
+    }
+}
